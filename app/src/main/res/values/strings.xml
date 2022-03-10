@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Custom Gallery</string>
+    <string name="image">Image</string>
+    <string name="media">Media</string>
+    <string name="albums">Albums</string>
+    <string name="need_permission_error">Need external storage reading permission!</string>
+    <string name="get_permission">Get permission</string>
+    <string name="permission_alert_dialogue_title">App Require Permissions</string>
+    <string name="permission_alert_dialogue_description">Please allow permissions in settings</string>
+    <string name="settings">Settings</string>
+    <string name="exit">Exit</string>
+    <string name="instruction_for_read_external_storage_permission">Go to Settings and give permission manually</string>
+</resources>
