@@ -1,10 +1,8 @@
 package me.rail.customgallery.screens.medialist
 
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import me.rail.customgallery.databinding.ItemMediaBinding
@@ -15,10 +13,12 @@ class MediaAdapter(
     private val medias: ArrayList<Media>,
     private val onImageClick: ((Int) -> Unit)? = null,
     private val onVideoClick: ((Int) -> Unit)? = null
-):
+) :
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
 
-    class ImageViewHolder(val binding: ItemMediaBinding): RecyclerView.ViewHolder(binding.root)
+    var checkboxVisible = false
+
+    class ImageViewHolder(val binding: ItemMediaBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ImageViewHolder {
         val inflater = LayoutInflater.from(viewGroup.context)
@@ -35,24 +35,39 @@ class MediaAdapter(
                 crossfade(true)
             }
         }
-
+        holder.binding.checkBox.visibility = if (checkboxVisible) View.VISIBLE else View.GONE
         holder.binding.image.setOnClickListener {
-            var correctPosition = position
-            if (item is Image) {
-                onImageClick?.invoke(correctPosition)
-            } else {
-                for (i in 0..position) {
-                    if (medias[i] is Image) {
-                        correctPosition--
-                    }
+            if (checkboxVisible) {
+                if (holder.binding.checkBox.isChecked) {
+                    holder.binding.checkBox.isChecked = false
+                    medias[position].selected = false
+                } else {
+                    holder.binding.checkBox.isChecked = true
+                    medias[position].selected = true
                 }
-                onVideoClick?.invoke(correctPosition)
+            } else {
+                var correctPosition = position
+                if (item is Image) {
+                    onImageClick?.invoke(correctPosition)
+                } else {
+                    for (i in 0..position) {
+                        if (medias[i] is Image) {
+                            correctPosition--
+                        }
+                    }
+                    onVideoClick?.invoke(correctPosition)
+                }
             }
         }
 
-        holder.binding.image.setOnLongClickListener{
-           holder.binding.checkBox.visibility = View.VISIBLE
+        holder.binding.image.setOnLongClickListener {
+            holder.binding.checkBox.visibility = View.VISIBLE
+            checkboxVisible = true
+            notifyDataSetChanged()
             true
+        }
+        holder.binding.checkBox.setOnClickListener {
+            medias[position].selected = holder.binding.checkBox.isChecked
         }
     }
 

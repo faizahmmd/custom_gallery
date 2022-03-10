@@ -15,7 +15,7 @@ import me.rail.customgallery.screens.viewpager.ImageViewPagerFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MediaListFragment: Fragment() {
+class MediaListFragment : Fragment() {
     private lateinit var binding: FragmentMediaListBinding
 
     @Inject
