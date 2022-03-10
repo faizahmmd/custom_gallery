@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentMediaListBinding
@@ -50,6 +51,7 @@ class MediaListFragment : Fragment() {
         binding.mediaList.adapter = MediaAdapter(
             medias,
             onImageClick = ::onImageClick,
+            Glide.with(this)
         )
     }
 

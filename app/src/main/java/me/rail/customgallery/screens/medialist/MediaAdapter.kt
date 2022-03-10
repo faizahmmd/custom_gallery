@@ -3,8 +3,15 @@ package me.rail.customgallery.screens.medialist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.signature.ObjectKey
+import me.rail.customgallery.R
 import me.rail.customgallery.databinding.ItemMediaBinding
 import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
@@ -12,10 +19,9 @@ import me.rail.customgallery.models.Media
 class MediaAdapter(
     private val medias: ArrayList<Media>,
     private val onImageClick: ((Int) -> Unit)? = null,
-    private val onVideoClick: ((Int) -> Unit)? = null
+    private val glide: RequestManager
 ) :
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
-
     var checkboxVisible = false
 
     class ImageViewHolder(val binding: ItemMediaBinding) : RecyclerView.ViewHolder(binding.root)
@@ -31,9 +37,9 @@ class MediaAdapter(
         val item = medias[position]
 
         if (item is Image) {
-            holder.binding.image.load(item.uri) {
-                crossfade(true)
-            }
+            val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+            glide.load(item.uri).placeholder(R.drawable.ic_place_holder_24).apply(requestOptions)
+                .into(holder.binding.image)
         }
         holder.binding.checkBox.visibility = if (checkboxVisible) View.VISIBLE else View.GONE
         holder.binding.image.setOnClickListener {
@@ -55,7 +61,6 @@ class MediaAdapter(
                             correctPosition--
                         }
                     }
-                    onVideoClick?.invoke(correctPosition)
                 }
             }
         }

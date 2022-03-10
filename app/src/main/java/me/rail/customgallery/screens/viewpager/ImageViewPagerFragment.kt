@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import me.rail.customgallery.databinding.FragmentImageViewPagerBinding
 
-class ImageViewPagerFragment: Fragment() {
+class ImageViewPagerFragment : Fragment() {
     private lateinit var binding: FragmentImageViewPagerBinding
 
     override fun onCreateView(

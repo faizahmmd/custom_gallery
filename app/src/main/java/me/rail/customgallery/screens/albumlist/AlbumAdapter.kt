@@ -15,6 +15,9 @@ import androidx.core.content.FileProvider
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.ItemAlbumBinding
 import me.rail.customgallery.databinding.ItemMediaBinding
@@ -24,6 +27,7 @@ import me.rail.customgallery.models.Media
 import java.io.File
 
 class AlbumAdapter(
+    private val glide: RequestManager,
     private val onCameraClick: ((String) -> Unit)? = null,
     private val albums: LinkedHashMap<String, ArrayList<Media>>,
     private val onAlbumClick: ((String) -> Unit)? = null
@@ -42,6 +46,9 @@ class AlbumAdapter(
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
         if (position == 0) {
             holder.binding.image.load(R.drawable.ic_camera_24)
+//            val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+//            glide.load(R.drawable.ic_camera_24).apply(requestOptions)
+//                .into(holder.binding.image)
             holder.binding.name.text = ""
             holder.binding.count.text = ""
 
@@ -60,9 +67,10 @@ class AlbumAdapter(
             }
 
             if (thumbnail is Image) {
-                holder.binding.image.load(thumbnail.uri) {
-                    crossfade(true)
-                }
+                val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+                glide.load(thumbnail.uri).placeholder(R.drawable.ic_place_holder_24)
+                    .apply(requestOptions)
+                    .into(holder.binding.image)
             }
             holder.binding.name.text = name
             holder.binding.count.text = "$count $countUnit"

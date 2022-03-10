@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentAlbumListBinding
@@ -36,7 +37,7 @@ class AlbumListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mediaList.adapter = AlbumAdapter({
+        binding.mediaList.adapter = AlbumAdapter(Glide.with(this),{
             (activity as MainActivity).capturePhoto()
         }, MediaStorage.getAlbums()) {
             navigator.replaceFragment(

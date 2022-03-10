@@ -7,9 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import coil.load
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import me.rail.customgallery.R
 import me.rail.customgallery.databinding.ItemImageBinding
 
-class ImageFragment: Fragment() {
+class ImageFragment : Fragment() {
     private lateinit var binding: ItemImageBinding
 
     override fun onCreateView(
@@ -23,7 +27,13 @@ class ImageFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         arguments?.takeIf { it.containsKey(ARG_URI_STRING) }?.apply {
-            binding.image.load(Uri.parse(getString(ARG_URI_STRING)))
+            val requestOptions = RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+            context?.let {
+                Glide.with(it).load(Uri.parse(getString(ARG_URI_STRING)))
+                    .placeholder(R.drawable.ic_place_holder_24).apply(requestOptions)
+                    .into(binding.image)
+            }
         }
     }
 

@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import me.rail.customgallery.media.MediaStorage
 
-class ImageAdapter(fragment: FragmentActivity, private val albumName: String?):
+class ImageAdapter(fragment: FragmentActivity, private val albumName: String?) :
     FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = MediaStorage.getImageCount(albumName)
 
