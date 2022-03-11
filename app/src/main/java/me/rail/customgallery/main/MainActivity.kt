@@ -1,7 +1,6 @@
 package me.rail.customgallery.main
 
 import android.Manifest
-import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,12 +15,15 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.ActivityMainBinding
 import me.rail.customgallery.main.permission.SettingsOpener
@@ -29,8 +31,11 @@ import me.rail.customgallery.media.MediaHandler
 import me.rail.customgallery.screens.albumlist.AlbumListFragment
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.OutputStream
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 
@@ -38,9 +43,11 @@ import kotlin.system.exitProcess
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var activityResultLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var activityResultLauncherPermissionRequest: ActivityResultLauncher<Array<String>>
     private var permissionGrantedGallery: Boolean = false
     private var permissionGrantedCamera: Boolean = false
+    private lateinit var takePhoto: ActivityResultLauncher<Void?>
+    private lateinit var takeVideo: ActivityResultLauncher<Uri?>
 
     @Inject
     lateinit var navigator: Navigator
@@ -49,7 +56,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        activityResultLauncher =
+        activityResultLauncherPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 permissionGrantedGallery = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
                     ?: permissionGrantedGallery
@@ -58,10 +65,31 @@ class MainActivity : AppCompatActivity() {
                 if (permissionGrantedGallery && permissionGrantedCamera) {
                     showMedia()
                 } else {
-                    showAlert()
+                    showAlertOnPermissionDeny()
                 }
             }
         requestPermission()
+        takePhoto = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) {
+
+            lifecycleScope.launch {
+
+                if (savePhotoToExternalStorage(UUID.randomUUID().toString(), it)) {
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        R.string.photo_saved,
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+
+                    Toast.makeText(this@MainActivity, R.string.photo_save_error, Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+            }
+        }
+        takeVideo = registerForActivityResult(ActivityResultContracts.TakeVideo()) {}
     }
 
     private fun requestPermission() {
@@ -81,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             permissionRequest.add(Manifest.permission.CAMERA)
         }
         if (permissionRequest.isNotEmpty()) {
-            activityResultLauncher.launch(permissionRequest.toTypedArray())
+            activityResultLauncherPermissionRequest.launch(permissionRequest.toTypedArray())
         } else {
             showMedia()
         }
@@ -99,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         exitProcess(0)
     }
 
-    private fun showAlert() {
+    private fun showAlertOnPermissionDeny() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.permission_alert_dialogue_title)
         builder.setMessage(R.string.permission_alert_dialogue_description)
@@ -117,88 +145,84 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private var mUri: Uri? = null
-    private val OPERATION_CAPTURE_PHOTO = 1
-    fun capturePhoto() {
-        println("********IMAGE STORAGE PATH -  $externalCacheDir*********")
-        val capturedImage = File(externalCacheDir, "${System.currentTimeMillis()}.jpg")
-        if (capturedImage.exists()) {
-            capturedImage.delete()
-        }
-        capturedImage.createNewFile()
-        mUri = if (Build.VERSION.SDK_INT >= 24) {
-            FileProvider.getUriForFile(
-                this, "me.rail.customgallery.provider",
-                capturedImage
-            )
-        } else {
-            Uri.fromFile(capturedImage)
+    fun showAlertSwitchToVideo() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.capture_alert_dialogue_title)
+        builder.setMessage(R.string.capture_alert_dialogue_description)
+
+        builder.setPositiveButton(R.string.capture_alert_dialogue_positive) { dialog, which ->
+            captureVideo()
         }
 
-        val intent = Intent("android.media.action.IMAGE_CAPTURE")
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri)
-        startActivityForResult(intent, OPERATION_CAPTURE_PHOTO)
-        try {
-            mUri?.let {
-                if (Build.VERSION.SDK_INT < 28) {
-                    val bitmap = MediaStore.Images.Media.getBitmap(
-                        this.contentResolver,
-                        it
-                    )
-                    saveMediaToStorage(bitmap)
-                } else {
-                    val source = ImageDecoder.createSource(this.contentResolver, it)
-                    val bitmap = ImageDecoder.decodeBitmap(source)
-                    saveMediaToStorage(bitmap)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        builder.setNegativeButton(R.string.capture_alert_dialogue_negative) { dialog, which ->
+            capturePhoto()
         }
+
+        builder.show()
+
     }
 
-    // this method saves the image to gallery
-    private fun saveMediaToStorage(bitmap: Bitmap) {
-        // Generating a file name
-        val filename = "${System.currentTimeMillis()}.jpg"
+    private fun captureVideo() {
+        var mUri: Uri? = null
+        takeVideo.launch(mUri)
+    }
 
-        // Output stream
-        var fos: OutputStream? = null
+    private fun capturePhoto() {
+        takePhoto.launch()
+    }
 
-        // For devices running android >= Q
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // getting the contentResolver
-            this.contentResolver?.also { resolver ->
 
-                // Content resolver will process the contentvalues
-                val contentValues = ContentValues().apply {
+    private fun savePhotoToExternalStorage(name: String, bmp: Bitmap?): Boolean {
 
-                    // putting file information in content values
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        val imageCollection: Uri = if (sdkCheck()) {
+            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        } else {
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+
+        val contentValues = ContentValues().apply {
+
+            put(MediaStore.Images.Media.DISPLAY_NAME, "$name.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            if (bmp != null) {
+                put(MediaStore.Images.Media.WIDTH, bmp.width)
+                put(MediaStore.Images.Media.HEIGHT, bmp.height)
+            }
+
+        }
+
+        return try {
+
+            contentResolver.insert(imageCollection, contentValues)?.also {
+
+                contentResolver.openOutputStream(it).use { outputStream ->
+
+                    if (bmp != null) {
+
+                        if (!bmp.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)) {
+
+                            throw IOException(R.string.save_bitmap_error.toString())
+                        }
+                    }
                 }
 
-                // Inserting the contentValues to
-                // contentResolver and getting the Uri
-                val imageUri: Uri? =
-                    resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            } ?: throw IOException(R.string.create_media_store_error.toString())
+            true
+        } catch (e: IOException) {
 
-                // Opening an outputstream with the Uri that we got
-                fos = imageUri?.let { resolver.openOutputStream(it) }
-            }
-        } else {
-            // These for devices running on android < Q
-            val imagesDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val image = File(imagesDir, filename)
-            fos = FileOutputStream(image)
+            e.printStackTrace()
+            false
         }
 
-        fos?.use {
-            // Finally writing the bitmap to the output stream that we opened
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-            Toast.makeText(this, "Captured View and saved to Gallery", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun sdkCheck(): Boolean {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return true
         }
+
+        return false
+
     }
 }

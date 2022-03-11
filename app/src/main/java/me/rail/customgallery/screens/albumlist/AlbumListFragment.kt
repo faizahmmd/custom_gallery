@@ -38,7 +38,7 @@ class AlbumListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.mediaList.adapter = AlbumAdapter(Glide.with(this),{
-            (activity as MainActivity).capturePhoto()
+            (activity as MainActivity).showAlertSwitchToVideo()
         }, MediaStorage.getAlbums()) {
             navigator.replaceFragment(
                 R.id.container,
