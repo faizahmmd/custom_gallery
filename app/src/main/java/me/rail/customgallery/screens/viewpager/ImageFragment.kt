@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import coil.load
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -31,7 +30,7 @@ class ImageFragment : Fragment() {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
             context?.let {
                 Glide.with(it).load(Uri.parse(getString(ARG_URI_STRING)))
-                    .placeholder(R.drawable.ic_place_holder_24).apply(requestOptions)
+                    .placeholder(R.drawable.ic_image_placeholder_24).apply(requestOptions)
                     .into(binding.image)
             }
         }

@@ -3,22 +3,21 @@ package me.rail.customgallery.screens.medialist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.signature.ObjectKey
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.ItemMediaBinding
 import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
+import me.rail.customgallery.models.Video
 
 class MediaAdapter(
     private val medias: ArrayList<Media>,
     private val onImageClick: ((Int) -> Unit)? = null,
+    private val onVideoClick: ((Int) -> Unit)? = null,
     private val glide: RequestManager
 ) :
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
@@ -38,7 +37,13 @@ class MediaAdapter(
 
         if (item is Image) {
             val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-            glide.load(item.uri).placeholder(R.drawable.ic_place_holder_24).apply(requestOptions)
+            glide.load(item.uri).placeholder(R.drawable.ic_image_placeholder_24)
+                .apply(requestOptions)
+                .into(holder.binding.image)
+        } else if (item is Video) {
+            val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+            glide.load(item.thumbnail).placeholder(R.drawable.ic_video_placeholder_24)
+                .apply(requestOptions)
                 .into(holder.binding.image)
         }
         holder.binding.checkBox.visibility = if (checkboxVisible) View.VISIBLE else View.GONE
@@ -61,6 +66,7 @@ class MediaAdapter(
                             correctPosition--
                         }
                     }
+                    onVideoClick?.invoke(correctPosition)
                 }
             }
         }

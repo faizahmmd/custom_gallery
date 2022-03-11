@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.MediaStore
 import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
+import me.rail.customgallery.models.Video
 
 
 class MediaHandler {
@@ -46,6 +47,7 @@ class MediaHandler {
 
         MediaStorage.setMediasCount(cursor.count)
         MediaStorage.setImagesCount()
+        MediaStorage.setVideosCount()
 
         if (cursor.moveToFirst()) {
             var id: Long
@@ -74,9 +76,15 @@ class MediaHandler {
                     media = Image(uri, name)
                     MediaStorage.addImage(media)
                     MediaStorage.addImageToAlbum(bucket, media)
-                    MediaStorage.addMedia(media)
-                    MediaStorage.addMediaToAlbum(bucket, media)
+                } else {
+                    mediaMetadataRetriever.setDataSource(context, uri)
+                    val thumbnail = mediaMetadataRetriever.frameAtTime
+                    media = Video(uri, name, thumbnail)
+                    MediaStorage.addVideo(media)
+                    MediaStorage.addVideoToAlbum(bucket, media)
                 }
+                MediaStorage.addMedia(media)
+                MediaStorage.addMediaToAlbum(bucket, media)
             } while (cursor.moveToNext())
         }
 

@@ -12,6 +12,7 @@ import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentMediaListBinding
 import me.rail.customgallery.main.Navigator
 import me.rail.customgallery.media.MediaStorage
+import me.rail.customgallery.screens.video.VideoFragment
 import me.rail.customgallery.screens.viewpager.ImageViewPagerFragment
 import javax.inject.Inject
 
@@ -51,6 +52,7 @@ class MediaListFragment : Fragment() {
         binding.mediaList.adapter = MediaAdapter(
             medias,
             onImageClick = ::onImageClick,
+            onVideoClick = ::onVideoClick,
             Glide.with(this)
         )
     }
@@ -59,6 +61,19 @@ class MediaListFragment : Fragment() {
         navigator.replaceFragment(
             R.id.container,
             ImageViewPagerFragment.newInstance(position, albumName),
+            true
+        )
+    }
+
+    private fun onVideoClick(position: Int) {
+        navigator.replaceFragment(
+            R.id.container,
+            VideoFragment.newInstance(
+                MediaStorage.getVideoByPosition(
+                    position,
+                    albumName
+                ).uri.toString()
+            ),
             true
         )
     }
