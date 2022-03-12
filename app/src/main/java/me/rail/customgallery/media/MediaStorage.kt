@@ -5,7 +5,7 @@ import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
 import me.rail.customgallery.models.Video
 
-object MediaStorage {
+object  MediaStorage {
     private var mediasCount = 0
 
     private lateinit var medias: ArrayList<Media>

@@ -23,11 +23,14 @@ import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.ActivityMainBinding
 import me.rail.customgallery.main.permission.SettingsOpener
 import me.rail.customgallery.media.MediaHandler
+import me.rail.customgallery.media.MediaStorage
 import me.rail.customgallery.screens.albumlist.AlbumListFragment
 import java.io.File
 import java.io.FileOutputStream
@@ -63,7 +66,9 @@ class MainActivity : AppCompatActivity() {
                 permissionGrantedCamera =
                     permissions[Manifest.permission.CAMERA] ?: permissionGrantedCamera
                 if (permissionGrantedGallery && permissionGrantedCamera) {
-                    showMedia()
+                    CoroutineScope(Dispatchers.IO).launch{
+                        showMedia()
+                    }
                 } else {
                     showAlertOnPermissionDeny()
                 }
@@ -74,7 +79,6 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
 
                 if (savePhotoToExternalStorage(UUID.randomUUID().toString(), it)) {
-
                     Toast.makeText(
                         this@MainActivity,
                         R.string.photo_saved,
@@ -111,14 +115,18 @@ class MainActivity : AppCompatActivity() {
         if (permissionRequest.isNotEmpty()) {
             activityResultLauncherPermissionRequest.launch(permissionRequest.toTypedArray())
         } else {
-            showMedia()
+            CoroutineScope(Dispatchers.IO).launch {
+                showMedia()
+            }
         }
     }
 
-    private fun showMedia() {
-        val mediaHandler = MediaHandler()
-        mediaHandler.findMedia(applicationContext)
-
+    private suspend fun showMedia() {
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            val mediaHandler = MediaHandler()
+            mediaHandler.findMedia(applicationContext)
+        }
+        job.join()
         navigator.replaceFragment(R.id.container, AlbumListFragment())
     }
 
