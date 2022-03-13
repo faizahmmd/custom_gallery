@@ -46,11 +46,35 @@ class AlbumAdapter(
             val thumbnail = ArrayList(albums.values)[position][0]
             val name = ArrayList(albums.keys)[position]
             val count = ArrayList(albums.values)[position].size
+            var countUnit = ""
+            var containsImages = false
+            var containsVideos = false
 
-            var countUnit: String = if (count > 1) {
-                "photos"
+            for (i in 0 until ArrayList(albums.values)[position].size) {
+                if (ArrayList(albums.values)[position][i] is Image) {
+                    containsImages = true
+                } else if (ArrayList(albums.values)[position][i] is Video) {
+                    containsVideos = true
+                }
+            }
+            if (containsImages && !containsVideos) {
+                countUnit = if (count > 1) {
+                    "images"
+                } else {
+                    "image"
+                }
+            } else if (!containsImages && containsVideos) {
+                countUnit = if (count > 1) {
+                    "videos"
+                } else {
+                    "video"
+                }
             } else {
-                "photo"
+                countUnit = if (count > 1) {
+                    "items"
+                } else {
+                    "item"
+                }
             }
 
             if (thumbnail is Image) {
@@ -58,7 +82,7 @@ class AlbumAdapter(
                 glide.load(thumbnail.uri).placeholder(R.drawable.ic_image_placeholder_24)
                     .apply(requestOptions)
                     .into(holder.binding.image)
-            }else if (thumbnail is Video) {
+            } else if (thumbnail is Video) {
                 val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
                 glide.load(thumbnail.thumbnail).placeholder(R.drawable.ic_video_placeholder_24)
                     .apply(requestOptions)

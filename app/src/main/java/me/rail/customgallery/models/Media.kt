@@ -2,4 +2,5 @@ package me.rail.customgallery.models
 
 import android.net.Uri
 
-open class Media(open val uri: Uri, open val name: String, open var selected: Boolean? = false)
+open class Media(open val uri: Uri, open val name: String, open var selected: Boolean? = false) {
+}
