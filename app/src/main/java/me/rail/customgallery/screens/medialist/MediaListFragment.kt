@@ -11,9 +11,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentMediaListBinding
 import me.rail.customgallery.main.Navigator
-import me.rail.customgallery.media.MediaStorage
+import me.rail.customgallery.data.DataStorage
 import me.rail.customgallery.screens.video.VideoFragment
-import me.rail.customgallery.screens.viewpager.ImageViewPagerFragment
+import me.rail.customgallery.screens.image.ImageViewPagerFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,9 +44,9 @@ class MediaListFragment : Fragment() {
         albumName = arguments?.getString(ARG_ALBUM_NAME)
 
         val medias = if (albumName == null) {
-            MediaStorage.getMedias()
+            DataStorage.getMedias()
         } else {
-            MediaStorage.getMediasByAlbum(albumName!!)
+            DataStorage.getMediasByAlbum(albumName!!)
         }
 
         binding.mediaList.adapter = MediaAdapter(
@@ -69,7 +69,7 @@ class MediaListFragment : Fragment() {
         navigator.replaceFragment(
             R.id.container,
             VideoFragment.newInstance(
-                MediaStorage.getVideoByPosition(
+                DataStorage.getVideoByPosition(
                     position,
                     albumName
                 ).uri.toString()

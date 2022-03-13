@@ -1,11 +1,11 @@
-package me.rail.customgallery.media
+package me.rail.customgallery.data
 
 import android.net.Uri
 import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
 import me.rail.customgallery.models.Video
 
-object  MediaStorage {
+object DataStorage {
     private var mediasCount = 0
 
     private lateinit var medias: ArrayList<Media>

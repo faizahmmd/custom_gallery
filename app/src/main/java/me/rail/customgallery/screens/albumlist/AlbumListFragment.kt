@@ -12,12 +12,12 @@ import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentAlbumListBinding
 import me.rail.customgallery.main.MainActivity
 import me.rail.customgallery.main.Navigator
-import me.rail.customgallery.media.MediaStorage
+import me.rail.customgallery.data.DataStorage
 import me.rail.customgallery.screens.medialist.MediaListFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlbumListFragment : Fragment() {
+class AlbumListFragment(val addVideoGallery: Boolean) : Fragment() {
     private lateinit var binding: FragmentAlbumListBinding
 
     @Inject
@@ -38,8 +38,12 @@ class AlbumListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.mediaList.adapter = AlbumAdapter(Glide.with(this), {
-            (activity as MainActivity).showAlertSwitchToVideo()
-        }, MediaStorage.getAlbums()) {
+            if (addVideoGallery) {
+                (activity as MainActivity).showAlertSwitchToVideo()
+            } else {
+                (activity as MainActivity).capturePhoto()
+            }
+        }, DataStorage.getAlbums()) {
             navigator.replaceFragment(
                 R.id.container,
                 MediaListFragment.newInstance(it),

@@ -1,4 +1,4 @@
-package me.rail.customgallery.media
+package me.rail.customgallery.data
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
@@ -10,7 +10,7 @@ import me.rail.customgallery.models.Media
 import me.rail.customgallery.models.Video
 
 
-class MediaHandler {
+class DataHandler(private val addVideoGallery: Boolean) {
     private val mediaMetadataRetriever = MediaMetadataRetriever()
 
     fun findMedia(context: Context) {
@@ -29,11 +29,16 @@ class MediaHandler {
 
         val sortOrder = "date_added DESC"
 
-        val selection = (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
-                + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
-                + " OR "
-                + MediaStore.Files.FileColumns.MEDIA_TYPE + "="
-                + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+        val selection = if (addVideoGallery) {
+            (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+                    + " OR "
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+        } else {
+            (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+        }
 
         val queryUri = MediaStore.Files.getContentUri("external")
 
@@ -45,9 +50,9 @@ class MediaHandler {
             sortOrder
         ) ?: return
 
-        MediaStorage.setMediasCount(cursor.count)
-        MediaStorage.setImagesCount()
-        MediaStorage.setVideosCount()
+        DataStorage.setMediasCount(cursor.count)
+        DataStorage.setImagesCount()
+        DataStorage.setVideosCount()
 
         if (cursor.moveToFirst()) {
             var id: Long
@@ -74,17 +79,17 @@ class MediaHandler {
                 val media: Media
                 if (type == 1) {
                     media = Image(uri, name)
-                    MediaStorage.addImage(media)
-                    MediaStorage.addImageToAlbum(bucket, media)
+                    DataStorage.addImage(media)
+                    DataStorage.addImageToAlbum(bucket, media)
                 } else {
                     mediaMetadataRetriever.setDataSource(context, uri)
                     val thumbnail = mediaMetadataRetriever.frameAtTime
                     media = Video(uri, name, thumbnail)
-                    MediaStorage.addVideo(media)
-                    MediaStorage.addVideoToAlbum(bucket, media)
+                    DataStorage.addVideo(media)
+                    DataStorage.addVideoToAlbum(bucket, media)
                 }
-                MediaStorage.addMedia(media)
-                MediaStorage.addMediaToAlbum(bucket, media)
+                DataStorage.addMedia(media)
+                DataStorage.addMediaToAlbum(bucket, media)
             } while (cursor.moveToNext())
         }
 

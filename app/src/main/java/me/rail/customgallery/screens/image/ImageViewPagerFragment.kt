@@ -1,4 +1,4 @@
-package me.rail.customgallery.screens.viewpager
+package me.rail.customgallery.screens.image
 
 import android.os.Bundle
 import android.view.LayoutInflater

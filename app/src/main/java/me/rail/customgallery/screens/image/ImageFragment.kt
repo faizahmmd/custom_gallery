@@ -1,4 +1,4 @@
-package me.rail.customgallery.screens.viewpager
+package me.rail.customgallery.screens.image
 
 import android.net.Uri
 import android.os.Bundle

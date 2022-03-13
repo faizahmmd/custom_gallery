@@ -2,14 +2,11 @@ package me.rail.customgallery.main
 
 import android.Manifest
 import android.content.ContentValues
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.widget.Toast
@@ -19,7 +16,6 @@ import androidx.activity.result.launch
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,13 +25,9 @@ import kotlinx.coroutines.launch
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.ActivityMainBinding
 import me.rail.customgallery.main.permission.SettingsOpener
-import me.rail.customgallery.media.MediaHandler
-import me.rail.customgallery.media.MediaStorage
+import me.rail.customgallery.data.DataHandler
 import me.rail.customgallery.screens.albumlist.AlbumListFragment
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStream
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -44,13 +36,13 @@ import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var activityResultLauncherPermissionRequest: ActivityResultLauncher<Array<String>>
     private var permissionGrantedGallery: Boolean = false
     private var permissionGrantedCamera: Boolean = false
     private lateinit var takePhoto: ActivityResultLauncher<Void?>
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
+    private var addVideoGallery: Boolean = true
 
     @Inject
     lateinit var navigator: Navigator
@@ -75,23 +67,29 @@ class MainActivity : AppCompatActivity() {
             }
         requestPermission()
         takePhoto = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) {
+            if (it != null) {
 
-            lifecycleScope.launch {
+                lifecycleScope.launch {
 
-                if (savePhotoToExternalStorage(UUID.randomUUID().toString(), it)) {
-                    showMedia()
-                    Toast.makeText(
-                        this@MainActivity,
-                        R.string.photo_saved,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (savePhotoToExternalStorage(UUID.randomUUID().toString(), it)) {
+                        showMedia()
+                        Toast.makeText(
+                            this@MainActivity,
+                            R.string.photo_saved,
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                } else {
+                    } else {
 
-                    Toast.makeText(this@MainActivity, R.string.photo_save_error, Toast.LENGTH_SHORT)
-                        .show()
+                        Toast.makeText(
+                            this@MainActivity,
+                            R.string.photo_save_error,
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+
                 }
-
             }
         }
         takeVideo = registerForActivityResult(ActivityResultContracts.TakeVideo()) {
@@ -128,11 +126,11 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun showMedia() {
         val job = CoroutineScope(Dispatchers.IO).launch {
-            val mediaHandler = MediaHandler()
+            val mediaHandler = DataHandler(addVideoGallery)
             mediaHandler.findMedia(applicationContext)
         }
         job.join()
-        navigator.replaceFragment(R.id.container, AlbumListFragment())
+        navigator.replaceFragment(R.id.container, AlbumListFragment(addVideoGallery))
     }
 
     private fun quitApp() {
@@ -180,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         takeVideo.launch(mUri)
     }
 
-    private fun capturePhoto() {
+    fun capturePhoto() {
         takePhoto.launch()
     }
 
