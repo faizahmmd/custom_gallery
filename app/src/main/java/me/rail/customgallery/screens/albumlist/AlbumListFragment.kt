@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentAlbumListBinding
-import me.rail.customgallery.main.MainActivity
+import me.rail.customgallery.main.PermissionActivity
 import me.rail.customgallery.main.Navigator
 import me.rail.customgallery.data.DataStorage
 import me.rail.customgallery.screens.medialist.MediaListFragment
@@ -39,9 +39,9 @@ class AlbumListFragment(val addVideoGallery: Boolean) : Fragment() {
 
         binding.mediaList.adapter = AlbumAdapter(Glide.with(this), {
             if (addVideoGallery) {
-                (activity as MainActivity).showAlertSwitchToVideo()
+                (activity as PermissionActivity).showAlertSwitchToVideo()
             } else {
-                (activity as MainActivity).capturePhoto()
+                (activity as PermissionActivity).capturePhoto()
             }
         }, DataStorage.getAlbums()) {
             navigator.replaceFragment(

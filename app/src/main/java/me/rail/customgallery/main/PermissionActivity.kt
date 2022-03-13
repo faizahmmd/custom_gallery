@@ -23,9 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.rail.customgallery.R
-import me.rail.customgallery.databinding.ActivityMainBinding
 import me.rail.customgallery.main.permission.SettingsOpener
 import me.rail.customgallery.data.DataHandler
+import me.rail.customgallery.databinding.PermissionActivityBinding
 import me.rail.customgallery.screens.albumlist.AlbumListFragment
 import java.io.IOException
 import java.util.*
@@ -35,14 +35,14 @@ import kotlin.system.exitProcess
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+class PermissionActivity(private var addVideoGallery: Boolean = false) : AppCompatActivity() {
+    private lateinit var binding: PermissionActivityBinding
     private lateinit var activityResultLauncherPermissionRequest: ActivityResultLauncher<Array<String>>
     private var permissionGrantedGallery: Boolean = false
     private var permissionGrantedCamera: Boolean = false
     private lateinit var takePhoto: ActivityResultLauncher<Void?>
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
-    private var addVideoGallery: Boolean = true
+
 
     @Inject
     lateinit var navigator: Navigator
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
         activityResultLauncherPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 permissionGrantedGallery = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                     if (savePhotoToExternalStorage(UUID.randomUUID().toString(), it)) {
                         showMedia()
                         Toast.makeText(
-                            this@MainActivity,
+                            this@PermissionActivity,
                             R.string.photo_saved,
                             Toast.LENGTH_SHORT
                         ).show()
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
 
                         Toast.makeText(
-                            this@MainActivity,
+                            this@PermissionActivity,
                             R.string.photo_save_error,
                             Toast.LENGTH_SHORT
                         )
@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun quitApp() {
-        this@MainActivity.finish()
+        this@PermissionActivity.finish()
         exitProcess(0)
     }
 

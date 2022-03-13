@@ -29,7 +29,7 @@
                 android:resource="@xml/provider_path" />
         </provider>
         <activity
-            android:name=".main.MainActivity"
+            android:name=".main.PermissionActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
