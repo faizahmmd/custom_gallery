@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                 permissionGrantedCamera =
                     permissions[Manifest.permission.CAMERA] ?: permissionGrantedCamera
                 if (permissionGrantedGallery && permissionGrantedCamera) {
-                    CoroutineScope(Dispatchers.IO).launch{
+                    CoroutineScope(Dispatchers.IO).launch {
                         showMedia()
                     }
                 } else {
@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
 
                 if (savePhotoToExternalStorage(UUID.randomUUID().toString(), it)) {
+                    showMedia()
                     Toast.makeText(
                         this@MainActivity,
                         R.string.photo_saved,
@@ -93,7 +94,11 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-        takeVideo = registerForActivityResult(ActivityResultContracts.TakeVideo()) {}
+        takeVideo = registerForActivityResult(ActivityResultContracts.TakeVideo()) {
+            lifecycleScope.launch() {
+                showMedia()
+            }
+        }
     }
 
     private fun requestPermission() {

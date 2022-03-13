@@ -37,7 +37,7 @@ class AlbumListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mediaList.adapter = AlbumAdapter(Glide.with(this),{
+        binding.mediaList.adapter = AlbumAdapter(Glide.with(this), {
             (activity as MainActivity).showAlertSwitchToVideo()
         }, MediaStorage.getAlbums()) {
             navigator.replaceFragment(
