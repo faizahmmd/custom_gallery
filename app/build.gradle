@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "me.rail.customgallery"
-        minSdk 23
+        minSdk 21
         targetSdk 31
         versionCode 1
         versionName "1.0"
@@ -51,8 +51,8 @@ dependencies {
     implementation("io.coil-kt:coil:1.4.0")
 
     //Hilt
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    implementation "com.google.dagger:hilt-android:2.38.1"
+    kapt "com.google.dagger:hilt-compiler:2.38.1"
 
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'

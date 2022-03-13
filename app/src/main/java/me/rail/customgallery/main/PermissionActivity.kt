@@ -35,13 +35,14 @@ import kotlin.system.exitProcess
 
 
 @AndroidEntryPoint
-class PermissionActivity(private var addVideoGallery: Boolean = false) : AppCompatActivity() {
+class PermissionActivity() : AppCompatActivity() {
     private lateinit var binding: PermissionActivityBinding
     private lateinit var activityResultLauncherPermissionRequest: ActivityResultLauncher<Array<String>>
     private var permissionGrantedGallery: Boolean = false
     private var permissionGrantedCamera: Boolean = false
     private lateinit var takePhoto: ActivityResultLauncher<Void?>
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
+    private var addVideoGallery: Boolean = false
 
 
     @Inject
@@ -50,6 +51,8 @@ class PermissionActivity(private var addVideoGallery: Boolean = false) : AppComp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val intentValue = intent.getBooleanExtra("addVideoGallery", false)
+        addVideoGallery = intentValue
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
         activityResultLauncherPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
