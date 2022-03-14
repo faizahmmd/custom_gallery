@@ -9,7 +9,9 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import me.rail.customgallery.R
+import me.rail.customgallery.data.DataStorage
 import me.rail.customgallery.databinding.ItemMediaBinding
+import me.rail.customgallery.main.PermissionActivity
 import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
 import me.rail.customgallery.models.Video
@@ -21,7 +23,7 @@ class MediaAdapter(
     private val glide: RequestManager
 ) :
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
-    var checkboxVisible = false
+    private var checkboxVisible = false
 
     class ImageViewHolder(val binding: ItemMediaBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -56,6 +58,10 @@ class MediaAdapter(
                     holder.binding.checkBox.isChecked = true
                     medias[position].selected = true
                 }
+                println(
+                    "XXXXXXXXXXXXXXXXXXXXXXX" + DataStorage.getSelectedMedias()
+                        .toString() + "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+                )
             } else {
                 var correctPosition = position
                 if (item is Image) {

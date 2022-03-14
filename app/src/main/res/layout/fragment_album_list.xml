@@ -4,7 +4,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mediaList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="673dp"
         android:layout_margin="1dp" />
 
 </layout>

@@ -9,6 +9,7 @@ object DataStorage {
     private var mediasCount = 0
 
     private lateinit var medias: ArrayList<Media>
+    private lateinit var selectedMedias: ArrayList<Media>
     private lateinit var mediaAlbums: LinkedHashMap<String, ArrayList<Media>>
     private lateinit var images: ArrayList<Image>
     private lateinit var imageAlbums: LinkedHashMap<String, ArrayList<Image>>
@@ -169,6 +170,22 @@ object DataStorage {
             videos.size
         } else {
             videoAlbums[album]!!.size
+        }
+    }
+
+    fun getSelectedMedias(): ArrayList<Media> {
+        selectedMedias = ArrayList<Media>()
+        for (i in 0 until medias.size) {
+            if (medias[i].selected == true) {
+                selectedMedias.add(medias[i])
+            }
+        }
+        return selectedMedias
+    }
+
+    fun setAllMediasUnselected() {
+        for (i in 0 until medias.size) {
+            medias[i].selected = false
         }
     }
 }

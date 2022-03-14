@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,37 +24,39 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.rail.customgallery.R
-import me.rail.customgallery.main.permission.SettingsOpener
 import me.rail.customgallery.data.DataHandler
+import me.rail.customgallery.data.DataStorage
 import me.rail.customgallery.databinding.PermissionActivityBinding
+import me.rail.customgallery.main.permission.SettingsOpener
 import me.rail.customgallery.screens.albumlist.AlbumListFragment
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 
 @AndroidEntryPoint
 class PermissionActivity() : AppCompatActivity() {
-    private lateinit var binding: PermissionActivityBinding
+    lateinit var binding: PermissionActivityBinding
     private lateinit var activityResultLauncherPermissionRequest: ActivityResultLauncher<Array<String>>
     private var permissionGrantedGallery: Boolean = false
     private var permissionGrantedCamera: Boolean = false
     private lateinit var takePhoto: ActivityResultLauncher<Void?>
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
     private var addVideoGallery: Boolean = false
+    private var selectionLimit: Boolean = false
+    private var selectionLimitCount: Int = 0
 
 
     @Inject
     lateinit var navigator: Navigator
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val intentValue = intent.getBooleanExtra("addVideoGallery", false)
-        addVideoGallery = intentValue
+        addVideoGallery = intent.getBooleanExtra("addVideoGallery", false)
+        selectionLimit = intent.getBooleanExtra("selectionLimitOn", false)
+        selectionLimitCount = intent.getIntExtra("selectionLimitCount", 0)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
+        setSupportActionBar(binding.toolbar)
         activityResultLauncherPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 permissionGrantedGallery = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
@@ -238,5 +241,11 @@ class PermissionActivity() : AppCompatActivity() {
 
         return false
 
+    }
+
+    override fun onBackPressed() {
+        DataStorage.setAllMediasUnselected()
+        binding.button3.visibility = View.INVISIBLE
+        super.onBackPressed()
     }
 }

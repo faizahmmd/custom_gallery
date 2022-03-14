@@ -1,5 +1,7 @@
 package me.rail.customgallery.screens.albumlist
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +19,7 @@ import me.rail.customgallery.screens.medialist.MediaListFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlbumListFragment(val addVideoGallery: Boolean) : Fragment() {
+class AlbumListFragment(private val addVideoGallery: Boolean) : Fragment() {
     private lateinit var binding: FragmentAlbumListBinding
 
     @Inject
@@ -36,7 +38,6 @@ class AlbumListFragment(val addVideoGallery: Boolean) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.mediaList.adapter = AlbumAdapter(Glide.with(this), {
             if (addVideoGallery) {
                 (activity as PermissionActivity).showAlertSwitchToVideo()
