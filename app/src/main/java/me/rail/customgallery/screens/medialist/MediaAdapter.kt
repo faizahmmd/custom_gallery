@@ -3,8 +3,8 @@ package me.rail.customgallery.screens.medialist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -49,20 +49,28 @@ class MediaAdapter(
                 .apply(requestOptions)
                 .into(holder.binding.image)
         }
-        if (PermissionActivity().multipleSelection) {
+        if (context.multipleSelection) {
             holder.binding.checkBox.visibility =
                 if (checkboxVisible) View.VISIBLE else View.INVISIBLE
         }
         holder.binding.image.setOnClickListener {
             context.showTickOnToolBar()
-            if (checkboxVisible && PermissionActivity().multipleSelection) {
+            if (checkboxVisible && context.multipleSelection) {
                 if (holder.binding.checkBox.isChecked) {
                     holder.binding.checkBox.isChecked = false
                     medias[position].selected = false
                 } else {
-                    holder.binding.checkBox.isChecked = true
-                    medias[position].selected = true
+                    if (context.selectionLimit && context.selectionLimitCount != null) {
+                        if (DataStorage.getSelectedMedias().size < context.selectionLimitCount!!) {
+                            holder.binding.checkBox.isChecked = true
+                            medias[position].selected = true
+                        } else {
+                            Toast.makeText(context, "Maximum selection reached", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
                 }
+                context.updateCountValueInToolBar()
             } else {
                 medias[position].selected = true
                 var correctPosition = position
@@ -89,8 +97,13 @@ class MediaAdapter(
             notifyDataSetChanged()
             true
         }
+
         holder.binding.checkBox.setOnClickListener {
-            medias[position].selected = holder.binding.checkBox.isChecked
+            if (context.selectionLimit && context.selectionLimitCount != null) {
+                if (DataStorage.getSelectedMedias().size < context.selectionLimitCount!!) {
+                    medias[position].selected = holder.binding.checkBox.isChecked
+                }
+            }
         }
     }
 

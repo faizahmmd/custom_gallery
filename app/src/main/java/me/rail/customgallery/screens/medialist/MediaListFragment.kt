@@ -12,7 +12,6 @@ import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentMediaListBinding
 import me.rail.customgallery.main.Navigator
 import me.rail.customgallery.data.DataStorage
-import me.rail.customgallery.databinding.PermissionActivityBinding
 import me.rail.customgallery.main.PermissionActivity
 import me.rail.customgallery.screens.video.VideoFragment
 import me.rail.customgallery.screens.image.ImageViewPagerFragment

@@ -45,8 +45,8 @@ class PermissionActivity() : AppCompatActivity() {
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
     private var addVideoGallery: Boolean = false
     var multipleSelection: Boolean = true
-    private var selectionLimit: Boolean = false
-    private var selectionLimitCount: Int = 0
+    var selectionLimit: Boolean = true
+    var selectionLimitCount: Int?=null
 
 
     @Inject
@@ -54,8 +54,8 @@ class PermissionActivity() : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addVideoGallery = intent.getBooleanExtra("addVideoGallery", false)
-        selectionLimit = intent.getBooleanExtra("selectionLimitOn", false)
-        selectionLimitCount = intent.getIntExtra("selectionLimitCount", 0)
+        selectionLimit = intent.getBooleanExtra("selectionLimitOn", true)
+        selectionLimitCount = intent.getIntExtra("selectionLimitCount", 5)
         multipleSelection = intent.getBooleanExtra("multipleSelection", true)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
         binding.button3.visibility = View.INVISIBLE
@@ -249,7 +249,8 @@ class PermissionActivity() : AppCompatActivity() {
     override fun onBackPressed() {
         DataStorage.setAllMediasUnselected()
         binding.button3.visibility = View.INVISIBLE
-        super.onBackPressed()
+        binding.text.text ="Gallery"
+            super.onBackPressed()
     }
 
     fun hideTickOnToolBar() {
@@ -258,5 +259,14 @@ class PermissionActivity() : AppCompatActivity() {
 
     fun showTickOnToolBar() {
         binding.button3.visibility = View.VISIBLE
+    }
+
+    fun updateCountValueInToolBar() {
+        var count = DataStorage.getSelectedMedias().size
+      if(selectionLimit && selectionLimitCount!=null){
+          binding.text.text = "$count/$selectionLimitCount"
+      }else{
+          binding.text.text = count.toString()
+      }
     }
 }
