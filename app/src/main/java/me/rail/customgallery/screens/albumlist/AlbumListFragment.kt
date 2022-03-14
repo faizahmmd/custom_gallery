@@ -15,6 +15,7 @@ import me.rail.customgallery.databinding.FragmentAlbumListBinding
 import me.rail.customgallery.main.PermissionActivity
 import me.rail.customgallery.main.Navigator
 import me.rail.customgallery.data.DataStorage
+import me.rail.customgallery.databinding.PermissionActivityBinding
 import me.rail.customgallery.screens.medialist.MediaListFragment
 import javax.inject.Inject
 

@@ -20,7 +20,6 @@ class ImageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = ItemImageBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 

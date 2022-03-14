@@ -44,6 +44,7 @@ class PermissionActivity() : AppCompatActivity() {
     private lateinit var takePhoto: ActivityResultLauncher<Void?>
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
     private var addVideoGallery: Boolean = false
+    var multipleSelection: Boolean = true
     private var selectionLimit: Boolean = false
     private var selectionLimitCount: Int = 0
 
@@ -55,7 +56,9 @@ class PermissionActivity() : AppCompatActivity() {
         addVideoGallery = intent.getBooleanExtra("addVideoGallery", false)
         selectionLimit = intent.getBooleanExtra("selectionLimitOn", false)
         selectionLimitCount = intent.getIntExtra("selectionLimitCount", 0)
+        multipleSelection = intent.getBooleanExtra("multipleSelection", true)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
+        binding.button3.visibility = View.INVISIBLE
         setSupportActionBar(binding.toolbar)
         activityResultLauncherPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -247,5 +250,13 @@ class PermissionActivity() : AppCompatActivity() {
         DataStorage.setAllMediasUnselected()
         binding.button3.visibility = View.INVISIBLE
         super.onBackPressed()
+    }
+
+    fun hideTickOnToolBar() {
+        binding.button3.visibility = View.INVISIBLE
+    }
+
+    fun showTickOnToolBar() {
+        binding.button3.visibility = View.VISIBLE
     }
 }

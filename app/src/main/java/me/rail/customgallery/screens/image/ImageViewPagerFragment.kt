@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import me.rail.customgallery.databinding.FragmentImageViewPagerBinding
+import me.rail.customgallery.main.PermissionActivity
 
 class ImageViewPagerFragment : Fragment() {
     private lateinit var binding: FragmentImageViewPagerBinding
@@ -33,6 +34,9 @@ class ImageViewPagerFragment : Fragment() {
         val albumName = arguments?.getString(ARG_ALBUM_NAME)
 
         binding.pager.adapter = ImageAdapter(requireActivity(), albumName)
+        if(!(activity as PermissionActivity).multipleSelection){
+            binding.pager.isUserInputEnabled = false
+        }
     }
 
     companion object {

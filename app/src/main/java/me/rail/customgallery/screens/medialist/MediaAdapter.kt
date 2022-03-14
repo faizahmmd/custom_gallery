@@ -20,7 +20,8 @@ class MediaAdapter(
     private val medias: ArrayList<Media>,
     private val onImageClick: ((Int) -> Unit)? = null,
     private val onVideoClick: ((Int) -> Unit)? = null,
-    private val glide: RequestManager
+    private val glide: RequestManager,
+    private val context: PermissionActivity
 ) :
     RecyclerView.Adapter<MediaAdapter.ImageViewHolder>() {
     private var checkboxVisible = false
@@ -48,9 +49,13 @@ class MediaAdapter(
                 .apply(requestOptions)
                 .into(holder.binding.image)
         }
-        holder.binding.checkBox.visibility = if (checkboxVisible) View.VISIBLE else View.GONE
+        if (PermissionActivity().multipleSelection) {
+            holder.binding.checkBox.visibility =
+                if (checkboxVisible) View.VISIBLE else View.INVISIBLE
+        }
         holder.binding.image.setOnClickListener {
-            if (checkboxVisible) {
+            context.showTickOnToolBar()
+            if (checkboxVisible && PermissionActivity().multipleSelection) {
                 if (holder.binding.checkBox.isChecked) {
                     holder.binding.checkBox.isChecked = false
                     medias[position].selected = false
@@ -58,11 +63,8 @@ class MediaAdapter(
                     holder.binding.checkBox.isChecked = true
                     medias[position].selected = true
                 }
-                println(
-                    "XXXXXXXXXXXXXXXXXXXXXXX" + DataStorage.getSelectedMedias()
-                        .toString() + "XXXXXXXXXXXXXXXXXXXXXXXXXX"
-                )
             } else {
+                medias[position].selected = true
                 var correctPosition = position
                 if (item is Image) {
                     onImageClick?.invoke(correctPosition)
@@ -75,6 +77,10 @@ class MediaAdapter(
                     onVideoClick?.invoke(correctPosition)
                 }
             }
+            println(
+                "XXXXXXXXXXXXXXXXXXXXXXX" + DataStorage.getSelectedMedias()
+                    .toString() + "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+            )
         }
 
         holder.binding.image.setOnLongClickListener {

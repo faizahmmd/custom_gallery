@@ -12,13 +12,14 @@ import me.rail.customgallery.R
 import me.rail.customgallery.databinding.FragmentMediaListBinding
 import me.rail.customgallery.main.Navigator
 import me.rail.customgallery.data.DataStorage
+import me.rail.customgallery.databinding.PermissionActivityBinding
 import me.rail.customgallery.main.PermissionActivity
 import me.rail.customgallery.screens.video.VideoFragment
 import me.rail.customgallery.screens.image.ImageViewPagerFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MediaListFragment : Fragment() {
+class MediaListFragment() : Fragment() {
     private lateinit var binding: FragmentMediaListBinding
 
     @Inject
@@ -54,7 +55,8 @@ class MediaListFragment : Fragment() {
             medias,
             onImageClick = ::onImageClick,
             onVideoClick = ::onVideoClick,
-            Glide.with(this)
+            Glide.with(this),
+            (requireActivity() as PermissionActivity)
         )
     }
 
