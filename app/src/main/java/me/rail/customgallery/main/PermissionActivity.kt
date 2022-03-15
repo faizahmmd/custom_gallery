@@ -48,7 +48,7 @@ class PermissionActivity() : AppCompatActivity() {
     private var addVideoGallery: Boolean = false
     var multipleSelection: Boolean = true
     var selectionLimit: Boolean = true
-    var selectionLimitCount: Int?=null
+    var selectionLimitCount: Int? = null
 
 
     @Inject
@@ -258,8 +258,8 @@ class PermissionActivity() : AppCompatActivity() {
     override fun onBackPressed() {
         DataStorage.setAllMediasUnselected()
         binding.button3.visibility = View.INVISIBLE
-        binding.text.text ="Gallery"
-            super.onBackPressed()
+        binding.text.text = "Gallery"
+        super.onBackPressed()
     }
 
     fun hideTickOnToolBar() {
@@ -272,10 +272,10 @@ class PermissionActivity() : AppCompatActivity() {
 
     fun updateCountValueInToolBar() {
         var count = DataStorage.getSelectedMedias().size
-      if(selectionLimit && selectionLimitCount!=null){
-          binding.text.text = "$count/$selectionLimitCount"
-      }else{
-          binding.text.text = count.toString()
-      }
+        if (selectionLimit && selectionLimitCount != null) {
+            binding.text.text = "$count/$selectionLimitCount"
+        } else {
+            binding.text.text = count.toString()
+        }
     }
 }

@@ -86,8 +86,7 @@ class MediaAdapter(
                 }
             }
             println(
-                "XXXXXXXXXXXXXXXXXXXXXXX" + DataStorage.getSelectedMedias()
-                    .toString() + "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+                "<-------------${DataStorage.getSelectedMedias()}---------->"
             )
         }
 
@@ -102,8 +101,15 @@ class MediaAdapter(
             if (context.selectionLimit && context.selectionLimitCount != null) {
                 if (DataStorage.getSelectedMedias().size < context.selectionLimitCount!!) {
                     medias[position].selected = holder.binding.checkBox.isChecked
+                } else {
+                    Toast.makeText(context, "Maximum selection reached", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
+            context.updateCountValueInToolBar()
+            println(
+                "<-------------${DataStorage.getSelectedMedias()}---------->"
+            )
         }
     }
 
