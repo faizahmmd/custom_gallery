@@ -60,6 +60,7 @@ class PermissionActivity() : AppCompatActivity() {
         selectionLimitCount = intent.getIntExtra("selectionLimitCount", 5)
         multipleSelection = intent.getBooleanExtra("multipleSelection", true)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
+        supportActionBar?.hide()
         binding.button3.visibility = View.INVISIBLE
         activityResultLauncherPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
