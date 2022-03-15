@@ -59,7 +59,6 @@ class PermissionActivity() : AppCompatActivity() {
         multipleSelection = intent.getBooleanExtra("multipleSelection", true)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
         binding.button3.visibility = View.INVISIBLE
-        setSupportActionBar(binding.toolbar)
         activityResultLauncherPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 permissionGrantedGallery = permissions[Manifest.permission.READ_EXTERNAL_STORAGE]
