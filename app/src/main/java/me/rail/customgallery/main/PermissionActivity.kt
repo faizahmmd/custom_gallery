@@ -45,7 +45,7 @@ class PermissionActivity() : AppCompatActivity() {
     private var permissionGrantedCamera: Boolean = false
     private lateinit var takePhoto: ActivityResultLauncher<Void?>
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
-    private var addVideoGallery: Boolean = false
+    private var addVideoGallery: Boolean = true
     var multipleSelection: Boolean = true
     var selectionLimit: Boolean = true
     var selectionLimitCount: Int? = null
@@ -55,10 +55,10 @@ class PermissionActivity() : AppCompatActivity() {
     lateinit var navigator: Navigator
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addVideoGallery = intent.getBooleanExtra("addVideoGallery", false)
-        selectionLimit = intent.getBooleanExtra("selectionLimitOn", true)
+        addVideoGallery = intent.getBooleanExtra("addVideoGallery", addVideoGallery)
+        selectionLimit = intent.getBooleanExtra("selectionLimitOn", selectionLimit)
         selectionLimitCount = intent.getIntExtra("selectionLimitCount", 5)
-        multipleSelection = intent.getBooleanExtra("multipleSelection", true)
+        multipleSelection = intent.getBooleanExtra("multipleSelection", multipleSelection)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
         supportActionBar?.hide()
         binding.button3.visibility = View.INVISIBLE
