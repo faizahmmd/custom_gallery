@@ -2,6 +2,7 @@ package me.rail.customgallery.main
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
@@ -28,6 +29,7 @@ import me.rail.customgallery.data.DataHandler
 import me.rail.customgallery.data.DataStorage
 import me.rail.customgallery.databinding.PermissionActivityBinding
 import me.rail.customgallery.main.permission.SettingsOpener
+import me.rail.customgallery.models.Media
 import me.rail.customgallery.screens.albumlist.AlbumListFragment
 import java.io.IOException
 import java.util.*
@@ -104,6 +106,13 @@ class PermissionActivity() : AppCompatActivity() {
             lifecycleScope.launch() {
                 showMedia()
             }
+        }
+        binding.button3.setOnClickListener {
+            val array: ArrayList<Media> = DataStorage.getSelectedMedias()
+            val resultIntent = Intent()
+            resultIntent.putExtra("Data", array)
+            setResult(RESULT_OK, resultIntent)
+            this@PermissionActivity.finish()
         }
     }
 
