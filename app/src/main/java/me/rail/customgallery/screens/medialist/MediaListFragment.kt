@@ -49,7 +49,7 @@ class MediaListFragment() : Fragment() {
         } else {
             DataStorage.getMediasByAlbum(albumName!!)
         }
-
+        binding.mediaList.setItemViewCacheSize(medias.size)
         binding.mediaList.adapter = MediaAdapter(
             medias,
             onImageClick = ::onImageClick,
