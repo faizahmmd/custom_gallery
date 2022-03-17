@@ -10,7 +10,7 @@ import me.rail.customgallery.models.Media
 import me.rail.customgallery.models.Video
 
 
-class DataHandler(private val addVideoGallery: Boolean) {
+class DataHandler(private val addVideoGallery: Boolean, private val addImageGallery: Boolean) {
     private val mediaMetadataRetriever = MediaMetadataRetriever()
 
     fun findMedia(context: Context) {
@@ -29,11 +29,14 @@ class DataHandler(private val addVideoGallery: Boolean) {
 
         val sortOrder = "date_added DESC"
 
-        val selection = if (addVideoGallery) {
+        val selection = if (addVideoGallery && addImageGallery) {
             (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
                     + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
                     + " OR "
                     + MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                    + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+        } else if (!addImageGallery && addVideoGallery) {
+            (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
                     + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
         } else {
             (MediaStore.Files.FileColumns.MEDIA_TYPE + "="

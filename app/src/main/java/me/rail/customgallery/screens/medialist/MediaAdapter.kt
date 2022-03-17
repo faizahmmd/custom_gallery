@@ -55,6 +55,7 @@ class MediaAdapter(
         }
         holder.binding.image.setOnClickListener {
             context.showTickOnToolBar()
+
             if (checkboxVisible && context.multipleSelection) {
                 if (holder.binding.checkBox.isChecked) {
                     holder.binding.checkBox.isChecked = false
@@ -68,6 +69,9 @@ class MediaAdapter(
                             Toast.makeText(context, "Maximum selection reached", Toast.LENGTH_SHORT)
                                 .show()
                         }
+                    } else {
+                        holder.binding.checkBox.isChecked = true
+                        medias[position].selected = true
                     }
                 }
                 context.updateCountValueInToolBar()
@@ -105,6 +109,8 @@ class MediaAdapter(
                     Toast.makeText(context, "Maximum selection reached", Toast.LENGTH_SHORT)
                         .show()
                 }
+            } else {
+                medias[position].selected = holder.binding.checkBox.isChecked
             }
             context.updateCountValueInToolBar()
             println(

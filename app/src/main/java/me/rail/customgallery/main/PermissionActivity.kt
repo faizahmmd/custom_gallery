@@ -46,9 +46,10 @@ class PermissionActivity() : AppCompatActivity() {
     private lateinit var takePhoto: ActivityResultLauncher<Void?>
     private lateinit var takeVideo: ActivityResultLauncher<Uri?>
     private var addVideoGallery: Boolean = true
+    private var addImageGallery: Boolean = true
     var multipleSelection: Boolean = true
     var selectionLimit: Boolean = true
-    var selectionLimitCount: Int? = null
+    var selectionLimitCount: Int = 5
 
 
     @Inject
@@ -56,8 +57,9 @@ class PermissionActivity() : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addVideoGallery = intent.getBooleanExtra("addVideoGallery", addVideoGallery)
+        addImageGallery = intent.getBooleanExtra("addImageGallery", addImageGallery)
         selectionLimit = intent.getBooleanExtra("selectionLimitOn", selectionLimit)
-        selectionLimitCount = intent.getIntExtra("selectionLimitCount", 5)
+        selectionLimitCount = intent.getIntExtra("selectionLimitCount", selectionLimitCount)
         multipleSelection = intent.getBooleanExtra("multipleSelection", multipleSelection)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
         supportActionBar?.hide()
@@ -144,11 +146,14 @@ class PermissionActivity() : AppCompatActivity() {
 
     private suspend fun showMedia() {
         val job = CoroutineScope(Dispatchers.IO).launch {
-            val mediaHandler = DataHandler(addVideoGallery)
+            val mediaHandler = DataHandler(addVideoGallery, addImageGallery)
             mediaHandler.findMedia(applicationContext)
         }
         job.join()
-        navigator.replaceFragment(R.id.container, AlbumListFragment(addVideoGallery))
+        navigator.replaceFragment(
+            R.id.container,
+            AlbumListFragment(addVideoGallery, addImageGallery)
+        )
     }
 
     private fun quitApp() {
@@ -191,7 +196,7 @@ class PermissionActivity() : AppCompatActivity() {
 
     }
 
-    private fun captureVideo() {
+    fun captureVideo() {
         var mUri: Uri? = null
         takeVideo.launch(mUri)
     }

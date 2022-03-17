@@ -20,7 +20,10 @@ import me.rail.customgallery.screens.medialist.MediaListFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlbumListFragment(private val addVideoGallery: Boolean) : Fragment() {
+class AlbumListFragment(
+    private val addVideoGallery: Boolean,
+    private val addImageGallery: Boolean
+) : Fragment() {
     private lateinit var binding: FragmentAlbumListBinding
 
     @Inject
@@ -40,9 +43,13 @@ class AlbumListFragment(private val addVideoGallery: Boolean) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.mediaList.adapter = AlbumAdapter(Glide.with(this), {
-            if (addVideoGallery) {
+            if (addVideoGallery && addImageGallery) {
                 (activity as PermissionActivity).showAlertSwitchToVideo()
-            } else {
+            } else if (addImageGallery && !addVideoGallery) {
+                (activity as PermissionActivity).capturePhoto()
+            } else if (!addImageGallery && addVideoGallery) {
+                (activity as PermissionActivity).captureVideo()
+            }else{
                 (activity as PermissionActivity).capturePhoto()
             }
         }, DataStorage.getAlbums()) {
