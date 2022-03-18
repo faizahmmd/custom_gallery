@@ -8,6 +8,7 @@
     <string name="permission_alert_dialogue_title">App Require Permissions</string>
     <string name="permission_alert_dialogue_description">Please allow permissions in settings</string>
     <string name="settings">Settings</string>
+    <string name="exit">Exit</string>
     <string name="capture_alert_dialogue_title">Capture</string>
     <string name="capture_alert_dialogue_description">Choose action</string>
     <string name="capture_alert_dialogue_positive">VIDEO</string>
