@@ -1,13 +1,20 @@
 package me.rail.customgallery.data
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.core.content.FileProvider
 import me.rail.customgallery.models.Image
 import me.rail.customgallery.models.Media
 import me.rail.customgallery.models.Video
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.lang.ref.WeakReference
 
 
 class DataHandler(private val addVideoGallery: Boolean, private val addImageGallery: Boolean) {
@@ -87,7 +94,14 @@ class DataHandler(private val addVideoGallery: Boolean, private val addImageGall
                 } else {
                     mediaMetadataRetriever.setDataSource(context, uri)
                     val thumbnail = mediaMetadataRetriever.frameAtTime
-                    media = Video(uri, name, thumbnail)
+                    val imageBitmap: WeakReference<Bitmap> = WeakReference<Bitmap>(thumbnail?.let {
+                        Bitmap.createScaledBitmap(
+                            it, thumbnail.height, thumbnail.width, false
+                        ).copy(Bitmap.Config.RGB_565, true)
+                    })
+                    val bm: Bitmap? = imageBitmap.get()
+                    val uriImage: Uri = saveImage(bm, context)
+                    media = Video(uri, name, uriImage)
                     DataStorage.addVideo(media)
                     DataStorage.addVideoToAlbum(bucket, media)
                 }
@@ -97,5 +111,28 @@ class DataHandler(private val addVideoGallery: Boolean, private val addImageGall
         }
 
         cursor.close()
+    }
+
+    private fun saveImage(bitmap: Bitmap?, context: Context): Uri {
+        val imagesFolder = File(context.cacheDir, "images"+ System.currentTimeMillis())
+        var uri: Uri? = null
+        try {
+            imagesFolder.mkdirs()
+            val file = File(imagesFolder, "img_" + System.currentTimeMillis() + ".jpeg")
+            val stream = FileOutputStream(file)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            stream.flush()
+            stream.close()
+            uri = FileProvider.getUriForFile(
+                context.applicationContext,
+                "${context.packageName}.library.file.provider",
+                file
+            )
+        } catch (e: FileNotFoundException) {
+            println(e.toString())
+        } catch (e: IOException) {
+            println(e.toString())
+        }
+        return uri!!
     }
 }

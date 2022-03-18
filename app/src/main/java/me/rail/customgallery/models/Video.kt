@@ -6,7 +6,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.io.Serializable
 
-data class Video(override val uri: Uri?, override val name: String?, val thumbnail: Bitmap?): Media(uri, name),
+data class Video(override val uri: Uri?, override val name: String?, val thumbnail: Uri?): Media(uri, name),
     Serializable,
     Parcelable {
     constructor(parcel: Parcel) : this(
