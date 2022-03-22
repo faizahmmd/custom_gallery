@@ -15,6 +15,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.ref.WeakReference
+import java.util.concurrent.TimeUnit
 
 
 class DataHandler(private val addVideoGallery: Boolean, private val addImageGallery: Boolean) {
@@ -94,6 +95,19 @@ class DataHandler(private val addVideoGallery: Boolean, private val addImageGall
                 } else {
                     mediaMetadataRetriever.setDataSource(context, uri)
                     val thumbnail = mediaMetadataRetriever.frameAtTime
+                    val duration =
+                        mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    val timeInMilliSeconds: Long = duration?.toLong() ?: 0
+                    val durationConverted = String.format(
+                        "%d:%d",
+                        TimeUnit.MILLISECONDS.toMinutes(timeInMilliSeconds),
+                        TimeUnit.MILLISECONDS.toSeconds(timeInMilliSeconds) -
+                                TimeUnit.MINUTES.toSeconds(
+                                    TimeUnit.MILLISECONDS.toMinutes(
+                                        timeInMilliSeconds
+                                    )
+                                )
+                    )
                     val imageBitmap: WeakReference<Bitmap> = WeakReference<Bitmap>(thumbnail?.let {
                         Bitmap.createScaledBitmap(
                             it, thumbnail.height, thumbnail.width, false
@@ -101,7 +115,7 @@ class DataHandler(private val addVideoGallery: Boolean, private val addImageGall
                     })
                     val bm: Bitmap? = imageBitmap.get()
                     val uriImage: Uri = saveImage(bm, context)
-                    media = Video(uri, name, uriImage)
+                    media = Video(uri, name, uriImage, durationConverted)
                     DataStorage.addVideo(media)
                     DataStorage.addVideoToAlbum(bucket, media)
                 }
@@ -114,7 +128,7 @@ class DataHandler(private val addVideoGallery: Boolean, private val addImageGall
     }
 
     private fun saveImage(bitmap: Bitmap?, context: Context): Uri {
-        val imagesFolder = File(context.cacheDir, "images"+ System.currentTimeMillis())
+        val imagesFolder = File(context.cacheDir, "images" + System.currentTimeMillis())
         var uri: Uri? = null
         try {
             imagesFolder.mkdirs()

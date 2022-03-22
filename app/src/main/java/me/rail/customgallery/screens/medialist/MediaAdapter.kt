@@ -44,6 +44,10 @@ class MediaAdapter(
                 .apply(requestOptions)
                 .into(holder.binding.image)
         } else if (item is Video) {
+            holder.binding.videoPlayIcon.visibility = View.VISIBLE
+            holder.binding.durationTextView.text = item.duration
+            holder.binding.durationTextView.visibility = View.VISIBLE
+
             val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
             glide.load(item.thumbnail).placeholder(R.drawable.ic_video_placeholder_24)
                 .apply(requestOptions)

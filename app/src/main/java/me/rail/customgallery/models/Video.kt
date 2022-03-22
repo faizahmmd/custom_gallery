@@ -6,13 +6,14 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.io.Serializable
 
-data class Video(override val uri: Uri?, override val name: String?, val thumbnail: Uri?): Media(uri, name),
+data class Video(override val uri: Uri?, override val name: String?, val thumbnail: Uri?, val duration: String?): Media(uri, name),
     Serializable,
     Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readParcelable(Uri::class.java.classLoader),
         parcel.readString(),
         parcel.readParcelable(Bitmap::class.java.classLoader),
+        parcel.readString(),
     ) {
     }
 
@@ -20,6 +21,7 @@ data class Video(override val uri: Uri?, override val name: String?, val thumbna
         parcel.writeParcelable(uri, flags)
         parcel.writeString(name)
         parcel.writeParcelable(thumbnail, flags)
+        parcel.writeString(duration)
     }
 
     override fun describeContents(): Int {
