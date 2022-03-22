@@ -1,16 +1,21 @@
 package me.rail.customgallery.main
 
 import android.Manifest
+import android.app.Dialog
 import android.content.ContentValues
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -179,21 +185,39 @@ class PermissionActivity() : AppCompatActivity() {
 
     }
 
+    //    fun showAlertSwitchToVideo() {
+//        val builder = AlertDialog.Builder(this)
+//        builder.setTitle(R.string.capture_alert_dialogue_title)
+//        builder.setMessage(R.string.capture_alert_dialogue_description)
+//
+//        builder.setPositiveButton(R.string.capture_alert_dialogue_positive) { dialog, which ->
+//            captureVideo()
+//        }
+//
+//        builder.setNegativeButton(R.string.capture_alert_dialogue_negative) { dialog, which ->
+//            capturePhoto()
+//        }
+//
+//        builder.show()
+//
+//    }
     fun showAlertSwitchToVideo() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.capture_alert_dialogue_title)
-        builder.setMessage(R.string.capture_alert_dialogue_description)
+        var dialog = Dialog(this)
+        dialog.setContentView(R.layout.custom_dialogue)
+        dialog.window?.setBackgroundDrawableResource(R.drawable.corner_shape)
+        var cameraPhoto: ImageView = dialog.findViewById(R.id.cameraPhoto)
+        var cameraVideo: ImageView = dialog.findViewById(R.id.cameraVideo)
 
-        builder.setPositiveButton(R.string.capture_alert_dialogue_positive) { dialog, which ->
-            captureVideo()
-        }
-
-        builder.setNegativeButton(R.string.capture_alert_dialogue_negative) { dialog, which ->
+        cameraPhoto.setOnClickListener {
             capturePhoto()
+            dialog.dismiss()
+        }
+        cameraVideo.setOnClickListener {
+            captureVideo()
+            dialog.dismiss()
         }
 
-        builder.show()
-
+        dialog.show();
     }
 
     fun captureVideo() {
