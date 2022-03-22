@@ -3,15 +3,14 @@ package me.rail.customgallery.main
 import android.Manifest
 import android.app.Dialog
 import android.content.ContentValues
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
@@ -25,7 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.airbnb.lottie.LottieAnimationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,7 +55,7 @@ class PermissionActivity() : AppCompatActivity() {
     var multipleSelection: Boolean = true
     var selectionLimit: Boolean = true
     var selectionLimitCount: Int = 5
-
+    lateinit var animationView: LottieAnimationView
 
     @Inject
     lateinit var navigator: Navigator
@@ -68,6 +67,8 @@ class PermissionActivity() : AppCompatActivity() {
         selectionLimitCount = intent.getIntExtra("selectionLimitCount", selectionLimitCount)
         multipleSelection = intent.getBooleanExtra("multipleSelection", multipleSelection)
         binding = DataBindingUtil.setContentView(this, R.layout.permission_activity)
+        animationView = binding.lottieAnimation
+        animationView.playAnimation()
         supportActionBar?.hide()
         binding.button3.visibility = View.INVISIBLE
         activityResultLauncherPermissionRequest =
@@ -156,6 +157,10 @@ class PermissionActivity() : AppCompatActivity() {
             mediaHandler.findMedia(applicationContext)
         }
         job.join()
+        Handler(Looper.getMainLooper()).post(Runnable {
+            animationView.cancelAnimation()
+            animationView.visibility = View.GONE
+        })
         navigator.replaceFragment(
             R.id.container,
             AlbumListFragment(addVideoGallery, addImageGallery)
